@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from tablesEx3 import *
+from tables import *
 from helpers import *
 import sys
 import time
