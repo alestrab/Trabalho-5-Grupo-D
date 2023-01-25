@@ -129,9 +129,8 @@ module vga(
   wire CounterXmaxed = (CounterX == 800); // 16 + 48 + 96 + 640
   wire CounterYmaxed = (CounterY == 525); // 10 +  2 + 33 + 480
   wire [3:0] row, col;
-  reg [1:0] 8to2 
-  initial
-    8to2 <= 0
+  integer 8to2 = 0;
+  
 
   always @(posedge clk or posedge reset)
     if (reset)
@@ -170,9 +169,9 @@ module vga(
   assign VGA_G = inDisplayArea ? {vdata[8to2+8t02:8to2+8to2+1], 2'b00} : 4'b0000;
   assign VGA_B = inDisplayArea ? {vdata[8to2+8t02:8to2+8to2+1], 2'b00} : 4'b0000;
   if (8to2 == 3)
-    8to2 <= 0;
+    8to2 = 0;
   else
-    8to2 <= 8to2+1;
+    8to2 = 8to2+1;
 endmodule
  
 module power_on_reset(

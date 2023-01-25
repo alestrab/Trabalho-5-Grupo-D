@@ -24,8 +24,9 @@ for x in data:
     data[i] = x[2:]
     i=i+1
 video = np.zeros(80,dtype=int)
-i=0 #line
+hexa = []
 j=0 #pixel
+i=0 #Line
 for x in data:
     r = int(x[0:2],2)
     g = int(x[2:4],2)
@@ -33,12 +34,14 @@ for x in data:
     gr = gray(r,g,b)
     video[i] = video[i] + gr*(10**(2*j)) #Little endian
     if j==3:
+        hexa.append(hex(int(str(video[i]),2))+',')
         j=0
         i=i+1
     else:
         j=j+1
+hexa = np.array(hexa)
 with open(filename+'-convertido.bin','wb') as f:
-    np.savetxt(f, video,fmt='%08d')
+    np.savetxt(f, hexa,fmt = '%s')
 
         
 
