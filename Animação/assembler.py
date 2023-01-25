@@ -44,6 +44,11 @@ def translate(a):
     elif code < space_table["code"]:
         for i in range(space_table["code"] - code):
             f.append(to_b(0, 8))
+    data = [to_b(0, 8) for i in range(space_table["data"])]
+    for i in dtable:
+        data[try_parse_int(dtable[i][0], base=2)] = dtable[i][1]
+    for i in data:
+        f.append(i) 
     video = len(vtable)
     if video > space_table["video"]:
         print( "Warning: video data truncated", video)
@@ -56,14 +61,7 @@ def translate(a):
     if video < space_table["video"]:
         for i in range(space_table["video"] - video):
             f.append(to_b(63, 8)) # white fill
-    for i in range(space_table["unused"]):
-        f.append(to_b(63, 8)) # white fill
     print( "Video:", len(vtable), "/", space_table["video"] )
-    data = [to_b(0, 8) for i in range(space_table["data"])]
-    for i in dtable:
-        data[try_parse_int(dtable[i][0], base=2)] = dtable[i][1]
-    for i in data:
-        f.append(i) 
     print( "Code:", code, "/", space_table["code"] )
     return f    
         
@@ -138,7 +136,7 @@ def write_file(a):
     file = open(name, 'w')
     j=0
     for i in a:
-        file.write(i + "\n")
+        file.write('RAM['+str(j)+']= 8\'b'+i + ";\n")
         j=j+1
     file.close()       
 
