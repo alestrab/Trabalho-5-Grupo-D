@@ -15,7 +15,6 @@ def down(data,mat,i,j):
     mat[2,:] = np.array([data[i+2,j-1],data[i+2,j],data[i+2,j+1]])
     return mat
 
-
 N = 10 #100x100 Grid
 vec = np.zeros((N,N)) #Grid
 for x in range(0,N):

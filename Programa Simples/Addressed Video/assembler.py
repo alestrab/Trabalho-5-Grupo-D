@@ -12,7 +12,7 @@ address_size = fields_table["address"]
 jump_size = fields_table["jump"]
 filename = filedialog.askopenfilename()
 if filename=='':
-    sys.exit(1)
+    exit()
 
 def main():
     a = prepare_file(filename)
