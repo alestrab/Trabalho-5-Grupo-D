@@ -1,25 +1,20 @@
-#Procura dois pontos pretos e conecta uma linha entre eles
-#Video possui 8x10 no total
-
-finddist: #Encontra a distancia entre dois pixels pretos e coloca na variavel dist
+#Encontra a distancia entre os dois pontos
+finddist: 
   LOAD counter
   ADD one
   STORE counter
   LDV 
-  JNZ next 
-  #Achou um ponto preto 
-  LOAD first
-  JNZ second
-  #Eh o primeiro a ser encontrado
-  LOAD counter
-  STORE first
+  JNZ next  #Checa se chegou em um ponto preto 
+  LOAD first 
+  JNZ second  #Checa se eh o primeiro 
+  LOAD counter 
+  STORE first #Adiciona o valor do contador na variavel first
   LOAD one
   JNZ next
 second:
-  #Segundo ponto preto
   LOAD counter
   SUB first
-  STORE dist
+  STORE dist  #dist = counter - first, dando a distancia entre os pontos pretos
   JNZ enddist
 next:
   LDV
@@ -27,61 +22,82 @@ next:
   LOAD one
   JNZ finddist
 enddist:
-LOAD zero
-STORE counter
+#Corrige a posicao de video para o primeiro ponto preto
+    LOAD size   #size = tamanho da imagem (79 pixels)
+    SUB counter #subtrai o numero de pixels que foi percorrido ateh encontrar os dois pontos 
+    ADD first   
+    STORE first 
+posinitial:
+#Incrementa o endereco de video ateh que o mesmo esteja na posicao do primeiro ponto preto
+    LOAD first
+    JNZ offset
+    LOAD one
+    JNZ fillline
+offset:
+    LDV
+    STVI
+    LOAD first
+    SUB one
+    STORE first
+    LOAD one
+    JNZ posinitial
 
+#Formacao da linha entre os pontos
+#dist = distancia entre os pontos, vai sendo subtraido 1 ateh chegar em 0
+#finaldist = distancia final, vai sendo subtraido apenas multiplos de 8 ateh chegar no valor final nao multiplo
 fillline:
-  LOAD dist     #Carrega a distancia
-  SUB one       #Aproxima 1
+  LOAD dist  
+  SUB one    
   STORE dist
-  JNZ move   #Checa se ainda falta pra chegar
-  #Chegou
+  JNZ move   
+#Preenche as celulas finais
 fillcolumn:
   LOAD finaldist
   JNZ fill
   LOAD one
   JNZ end
 fill:
-  LDV zero
+  LOAD zero
   STVI
   LOAD finaldist
   SUB one
   STORE finaldist
   LOAD one
   JNZ fillcolumn
-
+#Subrotina de fazer a linha - Move para outro endereco de video e checa se eh multiplo de 8 (numero de linhas)
 move:
   LOAD seven
   SUB i
-  JNZ nmultiplo #Checa se jah foram feitas 8 subtracoes, indicando que a distancia tem um multiplo de oito
-  #Deu 8
+  JNZ nmultiplo 
   LOAD finaldist
   SUB i
   STORE finaldist
 multiplo:
-  #Chegou no 8
-  LOAD i    #Carrega o contador de posicao
-  JNZ prox #Checa se ja andou 8 posicoes de memoria
-  #Chegou na posicao
+#Preenche a celula na linha para alinhar com o ponto preto inicial
+  LOAD i   
+  JNZ prox 
   LOAD zero 
   STVI
   LOAD one
   JNZ fillline
 prox:
+#Passa para o proximo endereco ateh chegar na linha na celula multipla a ser preenchida
   LDV
   STVI
   LOAD i
-  SUB i
+  SUB one
+  STORE i
+  LOAD one
   JNZ multiplo
-nmultiplo:    #Nao deu 8
+nmultiplo:
   LOAD i
   ADD one
   STORE i
   JNZ fillline
-
+#Delay e redelay
 end:
 LOAD max
-delay:          #Delay para visualizacao
+delay:    
   SUB one
   STORE temp
   LOAD max
@@ -93,15 +109,24 @@ redelay:
   LOAD max 
   JNZ end 
 
-.video 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+.video 0xFF,0xFF,0xFF,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
+#Contador para achar a distancia entre pontos
 .counter 0
-.first 0
+#Distancia entre os pontos
 .dist 0
+#Guarda o resto de enderecos a serem preenchidos para completar a linha
 .finaldist 0
+#Posicao do primeiro ponto preto
+.first 0
+#Contador para verificar se o numero tem uma componente multiplo do numero de colunas
 .i 0
+#Numero de colunas
+.seven 7
+#Tamanho da imagem
+.size 79
 
 .zero 0
 .one 1
-.seven 7
-.temp 0
 .max 255
+.temp 0

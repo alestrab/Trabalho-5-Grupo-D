@@ -15,6 +15,7 @@ second:
   LOAD counter
   SUB first
   STORE dist
+  STORE finaldist
   JNZ enddist
 next:
   LDV
@@ -75,7 +76,9 @@ prox:
   LDV
   STVI
   LOAD i
-  SUB i
+  SUB one
+  LOAD one
+  STORE i
   JNZ multiplo
 nmultiplo:
   LOAD i
